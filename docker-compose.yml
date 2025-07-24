@@ -2,11 +2,12 @@ version: '3.8'
 services:
   dynamodb:
     image: amazon/dynamodb-local
-    container_name: dynamodb_local
+    container_name: dynamodb
     ports:
       - "8000:8000"
     command: -jar DynamoDBLocal.jar -inMemory -sharedDb
   app:
+    container_name: message-api
     build: .
     ports:
       - "3000:3000"
@@ -14,7 +15,7 @@ services:
       - AWS_ACCESS_KEY_ID=dummy
       - AWS_SECRET_ACCESS_KEY=dummy
       - AWS_REGION=us-west-2
-      - DYNAMODB_ENDPOINT=http://dynamodb:8000
+      - DYNAMODB_ENDPOINT=http://localhost:8000
     depends_on:
       - dynamodb
     volumes:
