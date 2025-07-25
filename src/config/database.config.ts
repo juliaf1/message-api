@@ -9,8 +9,8 @@ export class DynamoDBService {
     this.client = new DynamoDB({
       region: process.env.AWS_REGION || 'us-west-2',
       endpoint: process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000',
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'dummy',
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'dummy',
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'user',
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'pass',
     });
   }
 
