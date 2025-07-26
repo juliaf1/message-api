@@ -9,10 +9,12 @@ import {
   ParseUUIDPipe,
   ValidationPipe,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageStatusDto } from './dto/update-message-status.dto';
 
+@ApiTags('messages')
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
@@ -32,7 +34,7 @@ export class MessagesController {
     return this.messagesService.create(createMessageDto);
   }
 
-  @Patch(':id') // PATCH /messages/:id
+  @Patch(':id/status') // PATCH /messages/:id/status
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateMessageStatusDto: UpdateMessageStatusDto,
