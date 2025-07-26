@@ -9,10 +9,12 @@ import {
   UpdateMessageStatusDto,
 } from './dto/update-message-status.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { MessagesRepository } from './messages.repository';
 
 @Injectable()
 export class MessagesService {
-  // TODO: Substituir com acesso ao repositório do DynamoDB
+  constructor(private readonly repository: MessagesRepository) {}
+
   private messages = [
     {
       id: '90f81cec-c915-4940-b648-bd263053722c',
@@ -47,15 +49,8 @@ export class MessagesService {
   ];
 
   findAll(senderId?: string) {
-    if (senderId) {
-      const messagesArray = this.messages.filter(
-        (message) => message.senderId === senderId,
-      );
-      if (messagesArray.length === 0)
-        throw new NotFoundException('Messages Not Found');
-      return messagesArray;
-    }
-    return this.messages;
+    console.log(senderId);
+    return this.repository.findAll();
   }
 
   findOne(id: string) {
