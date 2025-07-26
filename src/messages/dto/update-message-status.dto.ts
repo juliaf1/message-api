@@ -1,14 +1,37 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-export class UpdateMessageStatusDto {
-  @IsString()
-  @IsNotEmpty()
-  messageId: string;
+import { PartialType } from '@nestjs/mapped-types';
+import { IsNotEmpty, IsEnum } from 'class-validator';
 
-  // TODO: Mover status para um arquivo separado
-  // TODO: Validar troca de status (sent -> delivered -> seen)
+export class MessageStatusDto {
+  static STATUSES = {
+    SENT: 'SENT',
+    DELIVERED: 'DELIVERED',
+    SEEN: 'SEEN',
+  };
+  static TRANSITIONS = {
+    [MessageStatusDto.STATUSES.SENT]: [MessageStatusDto.STATUSES.DELIVERED],
+    [MessageStatusDto.STATUSES.DELIVERED]: [MessageStatusDto.STATUSES.SEEN],
+    [MessageStatusDto.STATUSES.SEEN]: [],
+  };
+
   @IsNotEmpty()
-  @IsEnum(['SENT', 'DELIVERED', 'SEEN'], {
+  @IsEnum(Object.values(MessageStatusDto.STATUSES), {
     message: 'Valid status required',
   })
-  status: 'SENT' | 'DELIVERED' | 'SEEN';
+  status: keyof typeof MessageStatusDto.STATUSES;
+
+  static isValidTransition(
+    newStatus: string,
+    previousStatus?: string,
+  ): boolean {
+    // Validação para garantir que a transição de status seja válida
+
+    if (!previousStatus) return newStatus === MessageStatusDto.STATUSES.SENT; // Se não houver status anterior, o único status válido é 'SENT'
+
+    if (MessageStatusDto.TRANSITIONS[previousStatus].includes(newStatus))
+      return true;
+
+    return false;
+  }
 }
+
+export class UpdateMessageStatusDto extends PartialType(MessageStatusDto) {}
