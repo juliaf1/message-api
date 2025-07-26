@@ -1,7 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageStatusDto } from './dto/update-message-status.dto';
-import { NotFoundException } from '@nestjs/common';
+import {
+  MessageStatusDto,
+  UpdateMessageStatusDto,
+} from './dto/update-message-status.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -9,7 +15,7 @@ export class MessagesService {
   // TODO: Substituir com acesso ao repositório do DynamoDB
   private messages = [
     {
-      id: 'uuid-1',
+      id: '90f81cec-c915-4940-b648-bd263053722c',
       content: 'Hello!',
       senderId: 'user-uuid-1',
       status: 'SENT',
@@ -67,16 +73,34 @@ export class MessagesService {
       id: string;
       content: string;
       senderId: string;
-      status: string;
+      status: 'SENT';
     } = {
       id: id,
       ...createMessageDto,
+      status: 'SENT',
     };
     this.messages.push(newMessage);
     return newMessage;
   }
 
   updateStatus(id: string, updateMessageStatusDto: UpdateMessageStatusDto) {
+    // Buscar mensagem pelo ID
+    const message = this.findOne(id);
+    if (!message) throw new NotFoundException('Message Not Found');
+
+    // Validar transição de status
+    if (
+      !MessageStatusDto.isValidTransition(
+        updateMessageStatusDto.status,
+        message.status,
+      )
+    ) {
+      throw new BadRequestException(
+        `Invalid status transition from ${message.status} to ${updateMessageStatusDto.status}`,
+      );
+    }
+
+    // TODO: Salvar no "banco"
     this.messages = this.messages.map((message) => {
       if (message.id === id) {
         return { ...message, ...updateMessageStatusDto };
@@ -84,6 +108,7 @@ export class MessagesService {
       return message;
     });
 
+    // TODO: Retornar DTO de mensagem atualizada
     return this.findOne(id);
   }
 }
