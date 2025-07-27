@@ -11,6 +11,30 @@ export class Message {
   updatedAt: Date;
   status: 'SENT' | 'DELIVERED' | 'SEEN';
 
+  get_pk(): string {
+    return `MESSAGE#${this.createdAt.toISOString().split('T')[0]}`;
+  }
+
+  get_sk(): string {
+    return `MESSAGE#${this.createdAt.getTime()}#${this.messageId}`;
+  }
+
+  get_sender_index_pk(): string {
+    return `SENDER#${this.senderId}`;
+  }
+
+  get_sender_index_sk(): string {
+    return `MESSAGE#${this.createdAt.getTime()}#${this.messageId}`;
+  }
+
+  get_message_index_pk(): string {
+    return `MESSAGE#${this.messageId}`;
+  }
+
+  get_message_index_sk(): string {
+    return `MESSAGE#${this.messageId}`;
+  }
+
   static newInstanceFromDTO(data: CreateMessageDto): Message {
     const id: string = uuidv4();
     const time = new Date();
