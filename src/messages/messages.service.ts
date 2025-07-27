@@ -13,7 +13,8 @@ export class MessagesService {
   constructor(private readonly repository: MessagesRepository) {}
 
   findAll(query: FindMessagesDto) {
-    const { senderId, startDate, endDate } = query;
+    const { senderId } = query;
+    let { startDate, endDate } = query;
 
     // Se nenhum dos parâmetros for passado, retornar erro
     if (!senderId && !startDate && !endDate) {
@@ -26,15 +27,15 @@ export class MessagesService {
       endDate &&
       endDate.getTime() - startDate.getTime() > 4 * 24 * 60 * 60 * 1000
     ) {
-      throw new Error('Date range cannot be greater than 4 days');
+      throw new BadRequestException('Date range cannot be greater than 4 days');
     }
 
-    // // Se startDate e endDate não forem passados, buscar por últimos 4 dias
-    // if (!startDate && !endDate) {
-    //   const now = new Date();
-    //   startDate = new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000);
-    //   endDate = now;
-    // }
+    // Se startDate e endDate não forem passados, buscar por últimos 4 dias
+    if (!startDate && !endDate) {
+      const now = new Date();
+      startDate = new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000);
+      endDate = now;
+    }
 
     if (senderId) {
       return this.repository.findBySenderId(senderId, startDate, endDate);

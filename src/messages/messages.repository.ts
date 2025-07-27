@@ -20,14 +20,12 @@ export class MessagesRepository {
 
   async upsertOne(message: Message): Promise<void> {
     const itemObject: Record<string, any> = {
-      pk: { S: `MESSAGE#${message.createdAt.toISOString().split('T')[0]}` },
-      sk: { S: `MESSAGE#${message.createdAt.getTime()}#${message.messageId}` },
-      gsi1pk: { S: `SENDER#${message.senderId}` },
-      gsi1sk: {
-        S: `MESSAGE#${message.createdAt.getTime()}#${message.messageId}`,
-      },
-      gsi2pk: { S: `MESSAGE#${message.messageId}` },
-      gsi2sk: { S: `MESSAGE#${message.messageId}` },
+      pk: { S: message.get_pk() },
+      sk: { S: message.get_sk() },
+      gsi1pk: { S: message.get_sender_index_pk() },
+      gsi1sk: { S: message.get_sender_index_sk() },
+      gsi2pk: { S: message.get_message_index_pk() },
+      gsi2sk: { S: message.get_message_index_sk() },
       content: { S: message.content },
       message_id: { S: message.messageId },
       sender_id: { S: message.senderId },
@@ -83,23 +81,14 @@ export class MessagesRepository {
   ): Promise<Message[]> {
     const result: Message[] = [];
 
-    // Se startDate e endDate for maior que 4 dias, retornar erro
-    if (
-      startDate &&
-      endDate &&
-      endDate.getTime() - startDate.getTime() > 4 * 24 * 60 * 60 * 1000
-    ) {
-      throw new Error('Date range cannot be greater than 4 days');
-    }
-
     const startTimestamp = startDate ? startDate.getTime() : 0;
     const endTimestamp = endDate ? endDate.getTime() : Date.now();
 
     const command = new QueryCommand({
       TableName: this.tableName,
-      IndexName: 'gsi2',
+      IndexName: 'gsi1',
       KeyConditionExpression:
-        'GSI1PK = :pk AND GSI1SK BETWEEN :startSK AND :endSK',
+        'gsi1pk = :pk AND gsi1sk BETWEEN :startSK AND :endSK',
       ExpressionAttributeValues: {
         ':pk': { S: `SENDER#${senderId}` },
         ':startSK': { S: `MESSAGE#${startTimestamp}` },
@@ -122,15 +111,6 @@ export class MessagesRepository {
 
   async findByDateRange(startDate: Date, endDate: Date): Promise<Message[]> {
     const result: Message[] = [];
-
-    // Se startDate e endDate for maior que 4 dias, retornar erro
-    if (
-      startDate &&
-      endDate &&
-      endDate.getTime() - startDate.getTime() > 4 * 24 * 60 * 60 * 1000
-    ) {
-      throw new Error('Date range cannot be greater than 4 days');
-    }
 
     // PK is MESSAGE#2025-07-27
     // SK is MESSAGE#1753575755582#70a35e02-3f73-4340-bca4-9d975815cfd6
