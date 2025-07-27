@@ -45,7 +45,6 @@ async function seed() {
 async function insertSampleData(client: DynamoDBClient, tableName: string) {
   console.log('Inserting sample data...');
 
-  const chatId = uuidv4();
   const userOneId = uuidv4();
   const userTwoId = uuidv4();
   const messageOneId = uuidv4();
@@ -56,21 +55,6 @@ async function insertSampleData(client: DynamoDBClient, tableName: string) {
   const messageTwoTimestamp = Date.now() + 200000;
 
   const items = [
-    {
-      pk: { S: `CHAT#${chatId}` },
-      sk: { S: 'CHAT' },
-      chat_id: { S: chatId },
-    },
-    {
-      pk: { S: `CHAT#${chatId}` },
-      sk: { S: `USER#${userOneId}` },
-      user_id: { S: userOneId },
-    },
-    {
-      pk: { S: `CHAT#${chatId}` },
-      sk: { S: `USER#${userTwoId}` },
-      user_id: { S: userTwoId },
-    },
     {
       pk: { S: `USER#${userOneId}` },
       sk: { S: 'PROFILE' },
@@ -103,13 +87,10 @@ async function insertSampleData(client: DynamoDBClient, tableName: string) {
       content: { S: 'Oi' },
       message_id: { S: messageOneId },
       sender_id: { S: userOneId },
-      chat_id: { S: chatId },
       created_at: { S: new Date(messageOneTimestamp).toISOString() },
       updated_at: { S: new Date(messageOneTimestamp).toISOString() },
       status: { S: 'SEEN' },
-      sent_at: { S: new Date(messageOneTimestamp).toISOString() },
-      delivered_at: { S: new Date(messageOneTimestamp).toISOString() },
-      seen_at: { S: new Date(messageOneTimestamp).toISOString() },
+      recipient_phone_number: { S: '40044828' },
     },
     {
       pk: { S: `MESSAGE#${formattedDate}` },
@@ -127,11 +108,10 @@ async function insertSampleData(client: DynamoDBClient, tableName: string) {
       content: { S: 'Oi, tudo bem?' },
       message_id: { S: messageTwoId },
       sender_id: { S: userTwoId },
-      chat_id: { S: chatId },
-      created_at: { S: new Date(messageTwoTimestamp).toISOString() },
-      updated_at: { S: new Date(messageTwoTimestamp).toISOString() },
+      created_at: { S: new Date(messageOneTimestamp).toISOString() },
+      updated_at: { S: new Date(messageOneTimestamp).toISOString() },
       status: { S: 'SENT' },
-      sent_at: { S: new Date(messageTwoTimestamp).toISOString() },
+      recipient_phone_number: { S: '40044828' },
     },
   ];
 
