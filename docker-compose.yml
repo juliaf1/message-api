@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   dynamodb:
     image: amazon/dynamodb-local
@@ -12,10 +11,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - AWS_ACCESS_KEY_ID=dummy
-      - AWS_SECRET_ACCESS_KEY=dummy
+      - AWS_ACCESS_KEY_ID=user
+      - AWS_SECRET_ACCESS_KEY=pass
       - AWS_REGION=us-west-2
-      - DYNAMODB_ENDPOINT=http://localhost:8000
+      - DYNAMODB_ENDPOINT=http://dynamodb:8000
     depends_on:
       - dynamodb
     volumes:
