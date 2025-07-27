@@ -73,7 +73,7 @@ export class MessagesService {
       );
     }
 
-    message.status = updateMessageStatusDto.status;
+    message.updateStatus(updateMessageStatusDto.status);
     return await this.repository.upsertOne(message);
   }
 }
