@@ -29,7 +29,7 @@ export class MessagesRepository {
       sender_id: { S: message.senderId },
       recipient_phone_number: { S: message.recipientPhoneNumber },
       created_at: { S: message.createdAt.toISOString() },
-      updated_at: { S: message.updatedAt.toISOString() },
+      updated_at: { S: new Date().toISOString() },
       status: { S: message.status },
     };
 
