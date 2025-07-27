@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsOptional, IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class FindMessagesDto {
   @ApiProperty({
@@ -17,6 +18,7 @@ export class FindMessagesDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   startDate?: Date;
 
@@ -26,6 +28,7 @@ export class FindMessagesDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   endDate?: Date;
 }
