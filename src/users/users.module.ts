@@ -6,5 +6,6 @@ import { UsersRepository } from './users.repository';
 @Module({
   controllers: [],
   providers: [UsersService, UsersRepository, DynamoDBService],
+  exports: [UsersService],
 })
 export class UsersModule {}
