@@ -1,4 +1,8 @@
-import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  ScanCommand,
+  QueryCommand,
+} from '@aws-sdk/client-dynamodb';
 import { Injectable } from '@nestjs/common';
 import { DynamoDBService } from '../config/database.config';
 import { Message } from './entities/message.entity';
@@ -10,6 +14,27 @@ export class MessagesRepository {
 
   constructor(private readonly dynamoService: DynamoDBService) {
     this.client = this.dynamoService.getClient();
+  }
+
+  async findById(id: string): Promise<Message | null> {
+    const command = new QueryCommand({
+      TableName: this.tableName,
+      IndexName: 'gsi2',
+      KeyConditionExpression: 'gsi2pk = :gsi2pk',
+      ExpressionAttributeValues: {
+        ':gsi2pk': { S: `MESSAGE#${id}` },
+      },
+      Limit: 1,
+    });
+
+    const response = await this.client.send(command);
+
+    if (response.Items && response.Items.length > 0) {
+      console.log('Item:', response.Items[0]);
+      return Message.newInstanceFromDynamoDB(response.Items[0]);
+    }
+
+    return null;
   }
 
   async findAll(): Promise<Message[]> {

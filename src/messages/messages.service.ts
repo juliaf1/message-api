@@ -54,11 +54,8 @@ export class MessagesService {
   }
 
   findOne(id: string) {
-    const message = this.messages.find((message) => message.id === id);
-
-    if (!message) throw new NotFoundException('Message Not Found');
-
-    return message;
+    console.log(id);
+    return this.repository.findById(id);
   }
 
   create(createMessageDto: CreateMessageDto) {
@@ -78,10 +75,12 @@ export class MessagesService {
     return newMessage;
   }
 
-  updateStatus(id: string, updateMessageStatusDto: UpdateMessageStatusDto) {
+  async updateStatus(
+    id: string,
+    updateMessageStatusDto: UpdateMessageStatusDto,
+  ) {
     // Buscar mensagem pelo ID
-    const message = this.findOne(id);
-    if (!message) throw new NotFoundException('Message Not Found');
+    const message = await this.repository.findById(id);
 
     // Validar transição de status
     if (
