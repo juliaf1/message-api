@@ -21,7 +21,9 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Get() // GET /messages or /messages?senderId=value
-  findAll(@Query(ValidationPipe) query: FindMessagesDto) {
+  findAll(
+    @Query(new ValidationPipe({ transform: true })) query: FindMessagesDto,
+  ) {
     return this.messagesService.findAll(query);
   }
 
