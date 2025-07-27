@@ -1,8 +1,6 @@
 import {
   DynamoDBClient,
   QueryCommand,
-  GetItemCommand,
-  BatchGetItemCommand,
   PutItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { Injectable } from '@nestjs/common';
@@ -57,21 +55,10 @@ export class MessagesRepository {
     const response = await this.client.send(command);
 
     if (response.Items && response.Items.length > 0) {
-      console.log('Item:', response.Items[0]);
       return Message.newInstanceFromDynamoDB(response.Items[0]);
     }
 
     return null;
-  }
-
-  generateDates(start: Date, end: Date): Date[] {
-    const dates: Date[] = [];
-    const current = new Date(start);
-    while (current <= end) {
-      dates.push(new Date(current));
-      current.setDate(current.getDate() + 1);
-    }
-    return dates;
   }
 
   async findBySenderId(
@@ -79,8 +66,6 @@ export class MessagesRepository {
     startDate: Date,
     endDate: Date,
   ): Promise<Message[]> {
-    const result: Message[] = [];
-
     const startTimestamp = startDate ? startDate.getTime() : 0;
     const endTimestamp = endDate ? endDate.getTime() : Date.now();
 
@@ -99,47 +84,54 @@ export class MessagesRepository {
     const response = await this.client.send(command);
 
     if (response.Items) {
-      response.Items.forEach((item) => {
-        console.log('Item:', item);
-        const message = Message.newInstanceFromDynamoDB(item);
-        result.push(message);
-      });
+      return this.mapItemsToMessages(response.Items);
     }
-
-    return result;
   }
 
   async findByDateRange(startDate: Date, endDate: Date): Promise<Message[]> {
-    const result: Message[] = [];
-
-    // PK is MESSAGE#2025-07-27
-    // SK is MESSAGE#1753575755582#70a35e02-3f73-4340-bca4-9d975815cfd6
-
     // Gera datas entre startDate e endDate
     const dates = this.generateDates(startDate, endDate);
 
-    // BatchGetItem para buscar mensagens por data
-    const keys = dates.map((date: Date) => ({
-      PK: { S: `MESSAGE#${date.toISOString().split('T')[0]}` },
-    }));
-
-    const command = new BatchGetItemCommand({
-      RequestItems: {
-        [this.tableName]: {
-          Keys: keys,
+    // Cria uma lista de promessas para consultar cada data
+    const queryPromises = dates.map((date) => {
+      const params = {
+        TableName: this.tableName,
+        KeyConditionExpression: 'pk = :pk AND sk BETWEEN :startSK AND :endSK',
+        ExpressionAttributeValues: {
+          ':pk': { S: `MESSAGE#${date}` },
+          ':startSK': { S: `MESSAGE#${startDate.getTime()}` },
+          ':endSK': { S: `MESSAGE#${endDate.getTime()}` },
         },
-      },
+      };
+
+      return this.client.send(new QueryCommand(params));
     });
 
-    const response = await this.client.send(command);
+    try {
+      const results = await Promise.all(queryPromises);
 
-    if (response.Responses && response.Responses[this.tableName]) {
-      response.Responses[this.tableName].forEach((item) => {
-        const message = Message.newInstanceFromDynamoDB(item);
-        result.push(message);
-      });
+      // Mapeia os resultados para instâncias de Message
+      // e achata o array de resultados
+      return results.flatMap((result) =>
+        this.mapItemsToMessages(result.Items || []),
+      );
+    } catch (error) {
+      console.error('Error querying messages:', error);
+      throw error;
     }
+  }
 
-    return result;
+  generateDates(startDate: Date, endDate: Date): string[] {
+    const dates: string[] = [];
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate).toISOString().split('T')[0]);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  }
+
+  mapItemsToMessages(items: Record<string, any>[]): Message[] {
+    return items.map((item) => Message.newInstanceFromDynamoDB(item));
   }
 }
