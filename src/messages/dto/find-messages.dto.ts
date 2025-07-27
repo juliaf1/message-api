@@ -14,7 +14,7 @@ export class FindMessagesDto {
 
   @ApiProperty({
     description: 'Start date for filtering messages',
-    example: '2023-10-01T00:00:00Z',
+    example: '2025-07-26',
     required: false,
   })
   @IsOptional()
@@ -24,7 +24,7 @@ export class FindMessagesDto {
 
   @ApiProperty({
     description: 'End date for filtering messages',
-    example: '2023-10-31T23:59:59Z',
+    example: '2025-07-28',
     required: false,
   })
   @IsOptional()
