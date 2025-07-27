@@ -10,6 +10,7 @@ async function bootstrap() {
       .setTitle('Mensagens API')
       .setDescription('API para gerenciamento de mensagens')
       .setVersion('1.0')
+      .addBearerAuth()
       .build();
 
     const document = SwaggerModule.createDocument(app, options);
