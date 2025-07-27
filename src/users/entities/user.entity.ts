@@ -26,7 +26,7 @@ export class User {
 
   static newInstanceFromDTO(data: UserDto): User {
     const user = new User();
-    user.userId = data.userId || uuidv4();
+    user.userId = uuidv4();
     user.externalId = data.externalId;
     user.createdAt = new Date();
     user.updatedAt = new Date();
