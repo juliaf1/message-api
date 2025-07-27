@@ -2,7 +2,7 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { v4 as uuidv4 } from 'uuid';
 
-enum MessageStatus {
+export enum MessageStatus {
   SENT = 'SENT',
   DELIVERED = 'DELIVERED',
   SEEN = 'SEEN',
