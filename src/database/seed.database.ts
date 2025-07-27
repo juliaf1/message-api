@@ -62,6 +62,8 @@ async function insertSampleData(client: DynamoDBClient, tableName: string) {
       gsi1sk: { S: `USER#${userOneId}` },
       external_id: { S: 'juliafrederico@usp.br' },
       user_id: { S: `${userOneId}` },
+      created_at: { S: new Date().toISOString() },
+      updated_at: { S: new Date().toISOString() },
     },
     {
       pk: { S: `USER#${userTwoId}` },
@@ -70,6 +72,8 @@ async function insertSampleData(client: DynamoDBClient, tableName: string) {
       gsi1sk: { S: `USER#${userTwoId}` },
       external_id: { S: '40044828' },
       user_id: { S: `${userTwoId}` },
+      created_at: { S: new Date().toISOString() },
+      updated_at: { S: new Date().toISOString() },
     },
     {
       pk: { S: `MESSAGE#${formattedDate}` },

@@ -7,14 +7,8 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(private readonly repository: UsersRepository) {}
 
-  findOne(id?: string, userDto?: UserDto): Promise<User | null> {
-    if (id) {
-      return this.repository.findById(id);
-    }
-    if (userDto) {
-      return this.repository.findByExternalId(userDto.externalId);
-    }
-    return null;
+  findOne(userDto: UserDto): Promise<User | null> {
+    return this.repository.findByExternalId(userDto.externalId);
   }
 
   create(userDto: UserDto) {
