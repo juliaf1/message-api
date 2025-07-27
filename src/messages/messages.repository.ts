@@ -18,12 +18,12 @@ export class MessagesRepository {
 
   async upsertOne(message: Message): Promise<void> {
     const itemObject: Record<string, any> = {
-      pk: { S: message.get_pk() },
-      sk: { S: message.get_sk() },
-      gsi1pk: { S: message.get_sender_index_pk() },
-      gsi1sk: { S: message.get_sender_index_sk() },
-      gsi2pk: { S: message.get_message_index_pk() },
-      gsi2sk: { S: message.get_message_index_sk() },
+      pk: { S: message.getPK() },
+      sk: { S: message.getSK() },
+      gsi1pk: { S: message.getSenderIndexPK() },
+      gsi1sk: { S: message.getSenderIndexSK() },
+      gsi2pk: { S: message.getMessageIndexPK() },
+      gsi2sk: { S: message.getMessageIndexSK() },
       content: { S: message.content },
       message_id: { S: message.messageId },
       sender_id: { S: message.senderId },

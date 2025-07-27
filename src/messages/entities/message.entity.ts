@@ -2,37 +2,64 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { v4 as uuidv4 } from 'uuid';
 
+enum MessageStatus {
+  SENT = 'SENT',
+  DELIVERED = 'DELIVERED',
+  SEEN = 'SEEN',
+}
+
 export class Message {
   messageId: string;
   senderId: string;
   recipientPhoneNumber: string;
+
   content: string;
+  mediaUrl?: string;
+  mediaType?: string;
+
   createdAt: Date;
   updatedAt: Date;
-  status: 'SENT' | 'DELIVERED' | 'SEEN';
 
-  get_pk(): string {
+  status: MessageStatus;
+  sentAt?: Date | null;
+  deliveredAt?: Date | null;
+  seenAt?: Date | null;
+
+  getPK(): string {
     return `MESSAGE#${this.createdAt.toISOString().split('T')[0]}`;
   }
 
-  get_sk(): string {
+  getSK(): string {
     return `MESSAGE#${this.createdAt.getTime()}#${this.messageId}`;
   }
 
-  get_sender_index_pk(): string {
+  getSenderIndexPK(): string {
     return `SENDER#${this.senderId}`;
   }
 
-  get_sender_index_sk(): string {
+  getSenderIndexSK(): string {
     return `MESSAGE#${this.createdAt.getTime()}#${this.messageId}`;
   }
 
-  get_message_index_pk(): string {
+  getMessageIndexPK(): string {
     return `MESSAGE#${this.messageId}`;
   }
 
-  get_message_index_sk(): string {
+  getMessageIndexSK(): string {
     return `MESSAGE#${this.messageId}`;
+  }
+
+  updateStatus(status: MessageStatus): void {
+    this.status = status;
+    this.updatedAt = new Date();
+
+    if (status === MessageStatus.SENT) {
+      this.sentAt = this.updatedAt;
+    } else if (status === MessageStatus.DELIVERED) {
+      this.deliveredAt = this.updatedAt;
+    } else if (status === MessageStatus.SEEN) {
+      this.seenAt = this.updatedAt;
+    }
   }
 
   static newInstanceFromDTO(data: CreateMessageDto): Message {
@@ -46,7 +73,7 @@ export class Message {
     message.content = data.content;
     message.createdAt = time;
     message.updatedAt = time;
-    message.status = 'SENT';
+    message.status = MessageStatus.SENT;
 
     return message;
   }
@@ -60,7 +87,7 @@ export class Message {
     message.content = data.content.S;
     message.createdAt = new Date(data.created_at.S);
     message.updatedAt = new Date(data.updated_at.S);
-    message.status = data.status.S as 'SENT' | 'DELIVERED' | 'SEEN';
+    message.status = data.status.S as MessageStatus;
     message.recipientPhoneNumber = data.recipient_phone_number.S;
     return message;
   }
