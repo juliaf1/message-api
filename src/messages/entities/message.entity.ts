@@ -11,11 +11,11 @@ export class Message {
     data: Record<string, AttributeValue>,
   ): Message {
     const message = new Message();
-    message.messageId = data.messageId.S;
-    message.senderId = data.senderId.S;
+    message.messageId = data.message_id.S;
+    message.senderId = data.sender_id.S;
     message.content = data.content.S;
-    message.createdAt = new Date(data.createdAt.S);
-    message.updatedAt = new Date(data.updatedAt.S);
+    message.createdAt = new Date(data.created_at.S);
+    message.updatedAt = new Date(data.updated_at.S);
     return message;
   }
 }
