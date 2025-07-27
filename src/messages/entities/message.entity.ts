@@ -6,6 +6,7 @@ export class Message {
   content: string;
   createdAt: Date;
   updatedAt: Date;
+  status: 'SENT' | 'DELIVERED' | 'SEEN';
 
   static newInstanceFromDynamoDB(
     data: Record<string, AttributeValue>,
@@ -16,6 +17,7 @@ export class Message {
     message.content = data.content.S;
     message.createdAt = new Date(data.created_at.S);
     message.updatedAt = new Date(data.updated_at.S);
+    message.status = data.status.S as 'SENT' | 'DELIVERED' | 'SEEN';
     return message;
   }
 }
