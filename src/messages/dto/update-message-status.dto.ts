@@ -1,8 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEnum } from 'class-validator';
 import { MessageStatus } from '../entities/message.entity';
 
-export class MessageStatusDto {
+export class UpdateMessageStatusDto {
   static STATUSES = MessageStatus;
   static TRANSITIONS = {
     [MessageStatus.SENT]: [MessageStatus.DELIVERED],
@@ -10,6 +10,10 @@ export class MessageStatusDto {
     [MessageStatus.SEEN]: [],
   };
 
+  @ApiProperty({
+    description: 'Status of the message',
+    example: 'SENT',
+  })
   @IsNotEmpty()
   @IsEnum(MessageStatus, {
     message: 'Valid status required',
@@ -21,10 +25,8 @@ export class MessageStatusDto {
     previousStatus?: MessageStatus,
   ): boolean {
     if (!previousStatus) return newStatus === MessageStatus.SENT;
-    if (MessageStatusDto.TRANSITIONS[previousStatus].includes(newStatus))
+    if (UpdateMessageStatusDto.TRANSITIONS[previousStatus].includes(newStatus))
       return true;
     return false;
   }
 }
-
-export class UpdateMessageStatusDto extends PartialType(MessageStatusDto) {}
