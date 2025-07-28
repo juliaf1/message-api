@@ -24,6 +24,10 @@ export class User {
     return `USER#${this.userId}`;
   }
 
+  isSystemUser(): boolean {
+    return this.externalId === 'SYSTEM';
+  }
+
   static newInstanceFromDTO(data: UserDto): User {
     const user = new User();
     user.userId = uuidv4();

@@ -49,6 +49,10 @@ export class Message {
     return `MESSAGE#${this.messageId}`;
   }
 
+  belongsToUser(userId: string): boolean {
+    return this.senderId === userId;
+  }
+
   updateStatus(status: MessageStatus): void {
     this.status = status;
     this.updatedAt = new Date();
