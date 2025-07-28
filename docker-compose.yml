@@ -24,6 +24,10 @@ services:
       - AWS_SECRET_ACCESS_KEY=pass
       - AWS_REGION=us-west-2
       - DYNAMODB_ENDPOINT=http://dynamodb:8000
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_USER_PASS=${JWT_USER_PASS}
+      - JWT_SYSTEM_PASS=${JWT_SYSTEM_PASS}
+      - NODE_ENV=development
     depends_on:
       - dynamodb
       - datadog-agent
