@@ -17,7 +17,7 @@ export class UsersRepository {
     this.client = this.dynamoService.getClient();
   }
 
-  async upsertOne(user: User): Promise<void> {
+  async upsertOne(user: User): Promise<User | null> {
     const itemObject: Record<string, any> = {
       pk: { S: user.getPK() },
       sk: { S: user.getSK() },
@@ -34,7 +34,12 @@ export class UsersRepository {
       Item: itemObject,
     });
 
-    await this.client.send(command);
+    const response = await this.client.send(command);
+
+    if (response.$metadata.httpStatusCode === 200) {
+      return user;
+    }
+    return null;
   }
 
   async findById(id: string): Promise<User | null> {

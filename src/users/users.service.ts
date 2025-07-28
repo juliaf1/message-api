@@ -11,7 +11,7 @@ export class UsersService {
     return this.repository.findByExternalId(userDto.externalId);
   }
 
-  create(userDto: UserDto) {
+  create(userDto: UserDto): Promise<User> {
     const user: User = User.newInstanceFromDTO(userDto);
     return this.repository.upsertOne(user);
   }
