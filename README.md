@@ -1,14 +1,16 @@
-## Description
+## Descrição
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Projeto de mensagens com DynamoDB, Docker e autenticação JWT.
 
-## Project setup
+Fork do [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+
+## Setup
 
 ```bash
 $ npm install
 ```
 
-## Compile and run the project
+## Compile e rode o projeto em dev
 
 ```bash
 # development
@@ -21,18 +23,41 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Run with Docker
-
-You can run the application and DynamoDB locally using Docker Compose:
+## Caminho alternativo: Rode com Docker
 
 ```bash
 $ docker-compose build
 $ docker-compose up -d
 ```
 
-This will start both the API and a local DynamoDB instance. The API will be available at `http://localhost:3000`.
+Os comandos vão buildar e iniciar o DynamoDB local e a API.
 
-## Run tests
+API estará disponível em: `http://localhost:3000`.
+
+## Acessar o container Docker para rodar comandos
+
+Para acessar o container e rodar comandos como `npx`, use:
+
+```bash
+$ docker exec -it message-api sh
+```
+
+Isso abrirá um shell dentro do container. Agora você pode rodar comandos como:
+
+```bash
+$ npm <comando>
+```
+
+## Criando o banco local e adicionando dados de exemplo
+
+Dentro da shell do container ou na sua bash (como preferir), rode os comandos:
+
+```bash
+$ npx ts-node src/database/create.database.ts
+$ npx ts-node src/database/seed.database.ts
+```
+
+## Rodando testes
 
 ```bash
 # unit tests
