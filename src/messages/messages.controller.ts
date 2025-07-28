@@ -20,6 +20,7 @@ import { FindMessagesDto } from './dto/find-messages.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import type { Request as ExpressRequest } from 'express';
 import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
 import { DatadogLoggerService } from '../logger/datadog-logger.service';
 
 @UseGuards(AuthGuard)
@@ -29,6 +30,7 @@ import { DatadogLoggerService } from '../logger/datadog-logger.service';
 export class MessagesController {
   constructor(
     private readonly messagesService: MessagesService,
+    private readonly usersService: UsersService,
     private readonly logger: DatadogLoggerService,
   ) {}
 
@@ -71,14 +73,23 @@ export class MessagesController {
   }
 
   @Post() // POST /messages
-  create(
+  async create(
     @Body(ValidationPipe) createMessageDto: CreateMessageDto,
     @Request() req: ExpressRequest,
   ) {
     const user: User = req.user;
 
-    // Se não for usuário do sistema, definir senderId como externalId do usuário
-    if (!user.isSystemUser()) {
+    if (user.isSystemUser()) {
+      // Se for usuário do sistema, verificar se o senderId é válido
+      const sender: User = await this.usersService.findOne(
+        createMessageDto.senderId,
+        undefined,
+      );
+      if (!sender) {
+        throw new ForbiddenException('Sender not found');
+      }
+    } else {
+      // Se não for usuário do sistema, definir senderId como externalId do usuário
       createMessageDto.senderId = user.userId;
     }
 
