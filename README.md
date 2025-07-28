@@ -32,11 +32,11 @@ $ docker-compose up -d
 
 Os comandos vão buildar e iniciar o DynamoDB local e a API.
 
-API estará disponível em: `http://localhost:3000`.
+API estará disponível em: [http://localhost:3000](http://localhost:3000).
 
 ## Acessar o container Docker para rodar comandos
 
-Para acessar o container e rodar comandos como `npx`, use:
+Para acessar o container da aplicação no Docker, use:
 
 ```bash
 $ docker exec -it message-api sh
@@ -69,3 +69,25 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## Acessando a documentação
+
+A documentação em Swagger do projeto estará disponível no endpoint apenas no ambiente de desenvolvimento: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+
+## Variáveis de ambientes
+
+Crie um arquivo `.env` e copie as variáveis do arquivo `.env.example`.
+
+  1. Gere uma chave para a `JWT_SECRET`:
+
+     ```bash
+     $ openssl rand -hex 64
+     ```
+
+  2. Gere uma chave para a `JWT_USER_PASS` e uma para a `JWT_SYSTEM_PASS`:
+
+     ```bash
+     $ node -e "const bcrypt = require('bcrypt'); bcrypt.hash('<sua senha aqui>', 10).then(hash => console.log(hash))"
+     ```
+
+  3. Crie uma conta e gere uma API Key do Datadog para habilitar monitoramento.
