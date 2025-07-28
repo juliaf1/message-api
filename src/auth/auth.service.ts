@@ -35,7 +35,7 @@ export class AuthService {
     );
     if (isMatch) {
       const payload = { sub: 'SYSTEM', userExternalId: 'SYSTEM' };
-      return await this.jwtService.signAsync(payload);
+      return await this.jwtService.signAsync(payload, { expiresIn: '60m' });
     }
 
     throw new UnauthorizedException('Invalid credentials');
@@ -55,7 +55,7 @@ export class AuthService {
     );
     if (isMatch) {
       const payload = { sub: user.userId, userExternalId: user.externalId };
-      return await this.jwtService.signAsync(payload);
+      return await this.jwtService.signAsync(payload, { expiresIn: '60m' });
     }
 
     throw new UnauthorizedException('Invalid credentials');
