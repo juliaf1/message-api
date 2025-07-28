@@ -6,10 +6,21 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { DatadogLoggerService } from './logger/datadog-logger.service';
+import { LoggingInterceptor } from './logger/logging.interceptor';
 
 @Module({
   imports: [MessagesModule, AuthModule, UsersModule],
   controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  providers: [
+    AppService,
+    AuthService,
+    DatadogLoggerService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
 export class AppModule {}
