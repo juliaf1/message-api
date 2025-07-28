@@ -16,7 +16,7 @@ export class MessagesRepository {
     this.client = this.dynamoService.getClient();
   }
 
-  async upsertOne(message: Message): Promise<void> {
+  async upsertOne(message: Message): Promise<Message | null> {
     const itemObject: Record<string, any> = {
       pk: { S: message.getPK() },
       sk: { S: message.getSK() },
@@ -38,7 +38,11 @@ export class MessagesRepository {
       Item: itemObject,
     });
 
-    await this.client.send(command);
+    const response = await this.client.send(command);
+    if (response.$metadata.httpStatusCode === 200) {
+      return message;
+    }
+    return null;
   }
 
   async findById(id: string): Promise<Message | null> {
