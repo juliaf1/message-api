@@ -17,10 +17,10 @@ import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageStatusDto } from './dto/update-message-status.dto';
 import { FindMessagesDto } from './dto/find-messages.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import type { Request as ExpressRequest } from 'express';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
+import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 import { DatadogLoggerService } from '../logger/datadog-logger.service';
 
 @UseGuards(AuthGuard)

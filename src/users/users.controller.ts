@@ -11,8 +11,8 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import type { Request as ExpressRequest } from 'express';
-import { User } from 'src/users/entities/user.entity';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { User } from './entities/user.entity';
+import { AuthGuard } from '../auth/auth.guard';
 import { DatadogLoggerService } from '../logger/datadog-logger.service';
 
 @UseGuards(AuthGuard)

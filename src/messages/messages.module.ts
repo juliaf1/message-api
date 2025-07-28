@@ -4,7 +4,7 @@ import { MessagesService } from './messages.service';
 import { MessagesRepository } from './messages.repository';
 import { DynamoDBService } from '../config/database.config';
 import { DatadogLoggerService } from '../logger/datadog-logger.service';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [UsersModule],
