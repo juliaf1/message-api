@@ -20,13 +20,17 @@ import { FindMessagesDto } from './dto/find-messages.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import type { Request as ExpressRequest } from 'express';
 import { User } from 'src/users/entities/user.entity';
+import { DatadogLoggerService } from '../logger/datadog-logger.service';
 
 @UseGuards(AuthGuard)
 @ApiTags('messages')
 @ApiBearerAuth()
 @Controller('messages')
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly logger: DatadogLoggerService,
+  ) {}
 
   @Get() // GET /messages or /messages?senderId=value
   findAll(
@@ -34,6 +38,13 @@ export class MessagesController {
     @Request() req: ExpressRequest,
   ) {
     const user: User = req.user;
+    this.logger.log(`Get Messages ${user.userId}`, 'MessagesController');
+    this.logger.logWithMetadata(
+      'log',
+      'Fetching user',
+      { userId: user.userId },
+      'MessagesController',
+    );
 
     // Se não for usuário do sistema, filtrar por senderId
     if (!user.isSystemUser()) {
