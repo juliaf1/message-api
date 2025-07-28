@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { MessageStatusDto } from './update-message-status.dto';
 
@@ -10,6 +10,8 @@ export class CreateMessageDto extends PartialType(MessageStatusDto) {
   })
   @IsString()
   @IsNotEmpty()
+  @MinLength(1)
+  @MaxLength(250)
   content: string;
 
   @ApiProperty({
@@ -21,8 +23,8 @@ export class CreateMessageDto extends PartialType(MessageStatusDto) {
   senderId: string;
 
   @ApiProperty({
-    description: 'ID of the recipient',
-    example: 'c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f',
+    description: 'Commercial phone number of the recipient',
+    example: '40043000',
   })
   @IsString()
   @IsNotEmpty()
