@@ -10,6 +10,7 @@ import {
   ValidationPipe,
   UseGuards,
   Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MessagesService } from './messages.service';
@@ -32,27 +33,63 @@ export class MessagesController {
     @Query(new ValidationPipe({ transform: true })) query: FindMessagesDto,
     @Request() req: ExpressRequest,
   ) {
-    const user: User | undefined = req.user;
-    console.log(user);
+    const user: User = req.user;
+
+    // Se não for usuário do sistema, filtrar por senderId
+    if (!user.isSystemUser()) {
+      query.senderId = user.userId;
+    }
 
     return this.messagesService.findAll(query);
   }
 
   @Get(':id') // GET /messages/:id
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.messagesService.findOne(id);
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Request() req: ExpressRequest,
+  ) {
+    const user: User = req.user;
+    const message = await this.messagesService.findOne(id);
+
+    // Se não for usuário do sistema, verificar se é dono da mensagem
+    if (!user.isSystemUser() && !message.belongsToUser(user.userId)) {
+      throw new ForbiddenException('Unauthorized access to this message');
+    }
+
+    return message;
   }
 
   @Post() // POST /messages
-  create(@Body(ValidationPipe) createMessageDto: CreateMessageDto) {
+  create(
+    @Body(ValidationPipe) createMessageDto: CreateMessageDto,
+    @Request() req: ExpressRequest,
+  ) {
+    const user: User = req.user;
+
+    // Se não for usuário do sistema, definir senderId como externalId do usuário
+    if (!user.isSystemUser()) {
+      createMessageDto.senderId = user.userId;
+    }
+
     return this.messagesService.create(createMessageDto);
   }
 
   @Patch(':id/status') // PATCH /messages/:id/status
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateMessageStatusDto: UpdateMessageStatusDto,
+    @Request() req: ExpressRequest,
   ) {
-    return this.messagesService.updateStatus(id, updateMessageStatusDto);
+    const user: User = req.user;
+    const message = await this.messagesService.findOne(id);
+
+    // Se não for usuário do sistema, verificar se é dono da mensagem
+    if (!user.isSystemUser() && !message.belongsToUser(user.userId)) {
+      throw new ForbiddenException(
+        'Unauthorized access to update this message',
+      );
+    }
+
+    return this.messagesService.updateStatus(message, updateMessageStatusDto);
   }
 }
