@@ -1,6 +1,6 @@
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
-import { UserDto } from '../dto/user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 
 export class User {
   userId: string;
@@ -28,7 +28,7 @@ export class User {
     return this.externalId === 'SYSTEM';
   }
 
-  static newInstanceFromDTO(data: UserDto): User {
+  static newInstanceFromDTO(data: CreateUserDto): User {
     const user = new User();
     user.userId = uuidv4();
     user.externalId = data.externalId;

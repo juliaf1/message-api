@@ -23,10 +23,10 @@ export class UsersRepository {
       sk: { S: user.getSK() },
       gsi1pk: { S: user.getExternalIdIndexPK() },
       gsi1sk: { S: user.getExternalIdIndexSK() },
-      createdAt: { S: user.createdAt.toISOString() },
-      updatedAt: { S: new Date().toISOString() },
-      userId: { S: user.userId },
-      externalId: { S: user.externalId },
+      created_at: { S: user.createdAt.toISOString() },
+      updated_at: { S: new Date().toISOString() },
+      user_id: { S: user.userId },
+      external_id: { S: user.externalId },
     };
 
     const command = new PutItemCommand({
