@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -25,9 +26,17 @@ export class AuthGuard implements CanActivate {
           secret: jwtConstants.secret,
         },
       );
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
+
+      request['token'] = payload;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      const userId: string = payload.sub;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      const externalId: string = payload.userExternalId;
+
+      const user = new User();
+      user.userId = userId;
+      user.externalId = externalId;
+      request.user = user;
     } catch {
       throw new UnauthorizedException();
     }
