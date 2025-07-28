@@ -49,6 +49,10 @@ export class Message {
     return `MESSAGE#${this.messageId}`;
   }
 
+  belongsToUser(userId: string): boolean {
+    return this.senderId === userId;
+  }
+
   updateStatus(status: MessageStatus): void {
     this.status = status;
     this.updatedAt = new Date();
@@ -73,6 +77,7 @@ export class Message {
     message.content = data.content;
     message.createdAt = time;
     message.updatedAt = time;
+    message.sentAt = time;
     message.status = MessageStatus.SENT;
 
     return message;
@@ -82,13 +87,24 @@ export class Message {
     data: Record<string, AttributeValue>,
   ): Message {
     const message = new Message();
-    message.messageId = data.message_id.S;
-    message.senderId = data.sender_id.S;
-    message.content = data.content.S;
-    message.createdAt = new Date(data.created_at.S);
-    message.updatedAt = new Date(data.updated_at.S);
-    message.status = data.status.S as MessageStatus;
-    message.recipientPhoneNumber = data.recipient_phone_number.S;
+    message.messageId = data.message_id?.S ?? '';
+    message.senderId = data.sender_id?.S ?? '';
+    message.content = data.content?.S ?? '';
+    message.createdAt = data.created_at?.S
+      ? new Date(data.created_at.S)
+      : new Date();
+    message.updatedAt = data.updated_at?.S
+      ? new Date(data.updated_at.S)
+      : new Date();
+    message.status = (data.status?.S as MessageStatus) ?? MessageStatus.SENT;
+    message.sentAt = data.sent_at?.S ? new Date(data.sent_at.S) : null;
+    message.deliveredAt = data.delivered_at?.S
+      ? new Date(data.delivered_at.S)
+      : null;
+    message.seenAt = data.seen_at?.S ? new Date(data.seen_at.S) : null;
+    message.mediaUrl = data.media_url?.S;
+    message.mediaType = data.media_type?.S;
+    message.recipientPhoneNumber = data.recipient_phone_number?.S ?? '';
     return message;
   }
 }

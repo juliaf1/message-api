@@ -42,7 +42,7 @@ export class AuthService {
   }
 
   private async loginUser(username: string, password: string): Promise<string> {
-    let user = await this.usersService.findOne({ externalId: username });
+    let user = await this.usersService.findOne(undefined, username);
     if (!user) {
       user = await this.usersService.create({
         externalId: username,

@@ -31,11 +31,21 @@ export class MessagesRepository {
       created_at: { S: message.createdAt.toISOString() },
       updated_at: { S: new Date().toISOString() },
       status: { S: message.status },
+      sent_at: message.sentAt ? { S: message.sentAt.toISOString() } : undefined,
+      delivered_at: message.deliveredAt
+        ? { S: message.deliveredAt.toISOString() }
+        : undefined,
+      seen_at: message.seenAt ? { S: message.seenAt.toISOString() } : undefined,
     };
+
+    // Remove keys with undefined values (simpler way)
+    const filteredItemObject = Object.fromEntries(
+      Object.entries(itemObject).filter(([_, v]) => v !== undefined),
+    );
 
     const command = new PutItemCommand({
       TableName: this.tableName,
-      Item: itemObject,
+      Item: filteredItemObject,
     });
 
     const response = await this.client.send(command);

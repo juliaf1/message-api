@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types';
-import { MessageStatusDto } from './update-message-status.dto';
 
-export class CreateMessageDto extends PartialType(MessageStatusDto) {
+export class CreateMessageDto {
   @ApiProperty({
     description: 'Content of the message',
     example: 'Hello, World!',

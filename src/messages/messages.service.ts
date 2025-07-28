@@ -1,9 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
 import {
-  MessageStatusDto,
-  UpdateMessageStatusDto,
-} from './dto/update-message-status.dto';
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageStatusDto } from './dto/update-message-status.dto';
 import { FindMessagesDto } from './dto/find-messages.dto';
 import { Message } from './entities/message.entity';
 import { MessagesRepository } from './messages.repository';
@@ -44,9 +45,12 @@ export class MessagesService {
     return this.repository.findByDateRange(startDate, endDate);
   }
 
-  findOne(id: string) {
-    console.log(id);
-    return this.repository.findById(id);
+  async findOne(id: string) {
+    const message = await this.repository.findById(id);
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+    return message;
   }
 
   create(createMessageDto: CreateMessageDto) {
@@ -55,15 +59,12 @@ export class MessagesService {
   }
 
   async updateStatus(
-    id: string,
+    message: Message,
     updateMessageStatusDto: UpdateMessageStatusDto,
   ) {
-    // Buscar mensagem pelo ID
-    const message = await this.repository.findById(id);
-
     // Validar transição de status
     if (
-      !MessageStatusDto.isValidTransition(
+      !UpdateMessageStatusDto.isValidTransition(
         updateMessageStatusDto.status,
         message.status,
       )
