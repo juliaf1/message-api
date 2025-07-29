@@ -81,7 +81,18 @@ export class MessagesRepository {
     endDate: Date,
   ): Promise<Message[]> {
     const startTimestamp = startDate ? startDate.getTime() : 0;
-    const endTimestamp = endDate ? endDate.getTime() : Date.now();
+    // Use end of the day for endDate
+    const endTimestamp = endDate
+      ? new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+          23,
+          59,
+          59,
+          999,
+        ).getTime()
+      : Date.now();
 
     const command = new QueryCommand({
       TableName: this.tableName,
