@@ -110,11 +110,9 @@ export class MessagesRepository {
     const queryPromises = dates.map((date) => {
       const params = {
         TableName: this.tableName,
-        KeyConditionExpression: 'pk = :pk AND sk BETWEEN :startSK AND :endSK',
+        KeyConditionExpression: 'pk = :pk',
         ExpressionAttributeValues: {
           ':pk': { S: `MESSAGE#${date}` },
-          ':startSK': { S: `MESSAGE#${startDate.getTime()}` },
-          ':endSK': { S: `MESSAGE#${endDate.getTime()}` },
         },
       };
 
